@@ -1,5 +1,5 @@
 module "instancias" {
-  source        = "git@github.com:Victor-Borges-Silva/Modulo-instancias.git?ref=v1.0.2"
+  source        = "git@github.com:Victor-Borges-Silva/Modulo-instancias.git?ref=v1.0.3"
   numero_de_ec2 = 3
 
   tags = {
@@ -11,7 +11,7 @@ module "instancias" {
 
 
 module "iam_policy_role" {
-  source = "git@github.com:Victor-Borges-Silva/Modulo-iam.git?ref=v1.0.1"
+  source = "git@github.com:Victor-Borges-Silva/Modulo-iam.git?ref=v1.0.2"
 
   #Criação da politica
   policy_name        = "Inicia_Desliga_EC2"
@@ -25,7 +25,7 @@ module "iam_policy_role" {
 
 module "lambda_inicia" {
   #source             = "../../../Modulo-lambda-inicia"
-  source             = "git@github.com:Victor-Borges-Silva/Modulo-lambda-inicia.git?ref=v1.0.2"
+  source             = "git@github.com:Victor-Borges-Silva/Modulo-lambda-inicia.git?ref=v1.0.4"
   nome_funcao_inicia = "IniciaEC2"
   instancia_id       = module.instancias.instance_id
   role               = module.iam_policy_role.iam_role_arn
@@ -33,7 +33,7 @@ module "lambda_inicia" {
 
 module "lambda_desliga" {
   #source              = "../../../Modulo-lambda-desliga"
-  source              = "git@github.com:Victor-Borges-Silva/Modulo-lambda-desliga.git?ref=v1.0.2"
+  source              = "git@github.com:Victor-Borges-Silva/Modulo-lambda-desliga.git?ref=v1.0.3"
   nome_funcao_desliga = "DesligaEC2"
   instancia_id        = module.instancias.instance_id
   role                = module.iam_policy_role.iam_role_arn
