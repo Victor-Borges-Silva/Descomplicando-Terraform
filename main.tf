@@ -5,7 +5,7 @@ module "instancias" {
   numero_de_ec2 = 1
 
   tags = {
-    Name        = "Teste"
+    Name        = "Projeto_Final"
     Terraform   = "Sim"
     Environment = "Dev"
     Backup      = "true"
