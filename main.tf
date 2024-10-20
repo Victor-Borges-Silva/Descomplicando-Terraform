@@ -1,6 +1,6 @@
 module "instancias" {
-  #source = "git@github.com:Victor-Borges-Silva/Modulo-instancias.git?ref=v1.0.3"
-  source = "../Modulo-instancias/"
+  source = "git@github.com:Victor-Borges-Silva/Modulo-instancias.git?ref=v1.0.4"
+  #source = "../Modulo-instancias/"
 
   numero_de_ec2  = 1
   tipo_instancia = "t3.micro"
@@ -15,8 +15,8 @@ module "instancias" {
 
 
 module "iam_policy_role" {
-  #source = "git@github.com:Victor-Borges-Silva/Modulo-iam.git?ref=v1.0.4"
-  source = "../Modulo-iam/"
+  source = "git@github.com:Victor-Borges-Silva/Modulo-iam.git?ref=v1.0.5"
+  #source = "../Modulo-iam/"
 
   #Criação da politica para EC2
   policy_name        = "Inicia_Desliga_EC2"
@@ -32,8 +32,8 @@ module "iam_policy_role" {
 }
 
 module "lambda_inicia" {
-  #source = "git@github.com:Victor-Borges-Silva/Modulo-lambda-inicia.git?ref=v1.0.4"
-  source                   = "../Modulo-lambda-inicia/"
+  source = "git@github.com:Victor-Borges-Silva/Modulo-lambda-inicia.git?ref=v1.0.5"
+  #source                   = "../Modulo-lambda-inicia/"
   nome_funcao_inicia       = "IniciaEC2"
   instancia_id             = module.instancias.instance_id
   role                     = module.iam_policy_role.iam_role_arn_ec2
@@ -45,8 +45,8 @@ module "lambda_inicia" {
 }
 
 module "lambda_desliga" {
-  #source = "git@github.com:Victor-Borges-Silva/Modulo-lambda-desliga.git?ref=v1.0.3"
-  source                   = "../Modulo-lambda-desliga/"
+  source = "git@github.com:Victor-Borges-Silva/Modulo-lambda-desliga.git?ref=v1.0.4"
+  #source                   = "../Modulo-lambda-desliga/"
   nome_funcao_desliga      = "DesligaEC2"
   instancia_id             = module.instancias.instance_id
   role                     = module.iam_policy_role.iam_role_arn_ec2
@@ -58,8 +58,8 @@ module "lambda_desliga" {
 }
 
 module "cloudwatch_inicia" {
-  #source = "git@github.com:Victor-Borges-Silva/Modulo-cloudwatch-inicia.git?ref=v1.0.2"
-  source                        = "../Modulo-cloudwatch-inicia/"
+  source = "git@github.com:Victor-Borges-Silva/Modulo-cloudwatch-inicia.git?ref=v1.0.3"
+  #source                        = "../Modulo-cloudwatch-inicia/"
   cloudwatch_inicia_name        = "Horario_de_inicio"
   agendamento_cron              = "cron(0 8 ? * MON-FRI *)"
   estado                        = "ENABLED"
@@ -72,8 +72,8 @@ module "cloudwatch_inicia" {
 }
 
 module "cloudwatch_desliga" {
-  #source = "git@github.com:Victor-Borges-Silva/Modulo-cloudwatch-desliga.git?ref=v1.0.2"
-  source                         = "../Modulo-cloudwatch-desliga/"
+  source = "git@github.com:Victor-Borges-Silva/Modulo-cloudwatch-desliga.git?ref=v1.0.3"
+  #source                         = "../Modulo-cloudwatch-desliga/"
   cloudwatch_desliga_name        = "Horario_de_desligamento"
   agendamento_cron               = "cron(0 22 ? * MON-FRI *)"
   estado                         = "ENABLED"
@@ -86,8 +86,8 @@ module "cloudwatch_desliga" {
 }
 
 module "Backup" {
-  #source = "git@github.com:Victor-Borges-Silva/Modulo-bakcup.git?ref=v1.0.3"
-  source                       = "../Modulo-bakcup/"
+  source = "git@github.com:Victor-Borges-Silva/Modulo-bakcup.git?ref=v1.0.4"
+  #source                       = "../Modulo-bakcup/"
   nome_cofre                   = "cofre_backup_tag"
   force_destruir               = true
   nome_plano_backup            = "plano_backup_tag"
