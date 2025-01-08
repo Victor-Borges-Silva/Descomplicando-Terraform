@@ -1,6 +1,6 @@
 module "instancias" {
-  source = "git@github.com:Victor-Borges-Silva/Modulo-instancias.git?ref=v1.0.4"
-  #source = "../Modulo-instancias/"
+  #source = "git@github.com:Victor-Borges-Silva/Modulo-instancias.git?ref=v1.0.4"
+  source = "../Modulo-instancias/"
 
   numero_de_ec2  = 1
   tipo_instancia = "t3.micro"
@@ -15,25 +15,38 @@ module "instancias" {
 
 
 module "iam_policy_role" {
-  source = "git@github.com:Victor-Borges-Silva/Modulo-iam.git?ref=v1.0.5"
-  #source = "../Modulo-iam/"
+  #source = "git@github.com:Victor-Borges-Silva/Modulo-iam.git?ref=v1.0.5"
+  source = "../Modulo-iam/"
+  #  for_each = { for atributo in var.modulo_iam_policy_role : null => atributo }
+  #
+  #  #Criação da politica para EC2
+  #  policy_name        = each.value.policy_name
+  #  policy_description = each.value.policy_description
+  #
+  #  #Criação da role para EC2
+  #  role_name        = each.value.role_name
+  #  role_description = each.value.role_description
+  #
+  #  #Criação de role para AWSBackup
+  #  nome_role_backup        = each.value.nome_role_backup
+  #  description_role_backup = each.value.description_role_backup
 
   #Criação da politica para EC2
-  policy_name        = "Inicia_Desliga_EC2"
-  policy_description = "Policy que permite o Lambda a desligar e ligar as instâncias EC2"
+  policy_name        = var.policy_name
+  policy_description = var.policy_description
 
   #Criação da role para EC2
-  role_name        = "Inicia_Desliga_EC2"
-  role_description = "Função que permite o Lambda a desligar e ligar as instâncias EC2"
+  role_name        = var.role_name
+  role_description = var.role_description
 
   #Criação de role para AWSBackup
-  nome_role_backup        = "role_backup"
-  description_role_backup = "Função que permite o cofre gerenciar os backups"
+  nome_role_backup        = var.nome_role_backup
+  description_role_backup = var.description_role_backup
 }
 
 module "lambda_inicia" {
-  source = "git@github.com:Victor-Borges-Silva/Modulo-lambda-inicia.git?ref=v1.0.5"
-  #source                   = "../Modulo-lambda-inicia/"
+  #source = "git@github.com:Victor-Borges-Silva/Modulo-lambda-inicia.git?ref=v1.0.5"
+  source                   = "../Modulo-lambda-inicia/"
   nome_funcao_inicia       = "IniciaEC2"
   instancia_id             = module.instancias.instance_id
   role                     = module.iam_policy_role.iam_role_arn_ec2
@@ -42,11 +55,12 @@ module "lambda_inicia" {
   armazenamento_temporario = 512
   rastreio_log             = "Active"
 
+  depends_on = [module.iam_policy_role]
 }
 
 module "lambda_desliga" {
-  source = "git@github.com:Victor-Borges-Silva/Modulo-lambda-desliga.git?ref=v1.0.4"
-  #source                   = "../Modulo-lambda-desliga/"
+  #source = "git@github.com:Victor-Borges-Silva/Modulo-lambda-desliga.git?ref=v1.0.4"
+  source                   = "../Modulo-lambda-desliga/"
   nome_funcao_desliga      = "DesligaEC2"
   instancia_id             = module.instancias.instance_id
   role                     = module.iam_policy_role.iam_role_arn_ec2
@@ -55,11 +69,12 @@ module "lambda_desliga" {
   armazenamento_temporario = 512
   rastreio_log             = "Active"
 
+  depends_on = [module.iam_policy_role]
 }
 
 module "cloudwatch_inicia" {
-  source = "git@github.com:Victor-Borges-Silva/Modulo-cloudwatch-inicia.git?ref=v1.0.3"
-  #source                        = "../Modulo-cloudwatch-inicia/"
+  #source = "git@github.com:Victor-Borges-Silva/Modulo-cloudwatch-inicia.git?ref=v1.0.3"
+  source                        = "../Modulo-cloudwatch-inicia/"
   cloudwatch_inicia_name        = "Horario_de_inicio"
   agendamento_cron              = "cron(0 8 ? * MON-FRI *)"
   estado                        = "ENABLED"
@@ -72,8 +87,8 @@ module "cloudwatch_inicia" {
 }
 
 module "cloudwatch_desliga" {
-  source = "git@github.com:Victor-Borges-Silva/Modulo-cloudwatch-desliga.git?ref=v1.0.3"
-  #source                         = "../Modulo-cloudwatch-desliga/"
+  #source = "git@github.com:Victor-Borges-Silva/Modulo-cloudwatch-desliga.git?ref=v1.0.3"
+  source                         = "../Modulo-cloudwatch-desliga/"
   cloudwatch_desliga_name        = "Horario_de_desligamento"
   agendamento_cron               = "cron(0 22 ? * MON-FRI *)"
   estado                         = "ENABLED"
@@ -86,8 +101,8 @@ module "cloudwatch_desliga" {
 }
 
 module "Backup" {
-  source = "git@github.com:Victor-Borges-Silva/Modulo-bakcup.git?ref=v1.0.4"
-  #source                       = "../Modulo-bakcup/"
+  #source = "git@github.com:Victor-Borges-Silva/Modulo-bakcup.git?ref=v1.0.4"
+  source                       = "../Modulo-bakcup/"
   nome_cofre                   = "cofre_backup_tag"
   force_destruir               = true
   nome_plano_backup            = "plano_backup_tag"
@@ -101,4 +116,6 @@ module "Backup" {
   selecao_recurso_tag_type     = "STRINGEQUALS"
   selecao_recurso_tag_key      = "Backup"
   selecao_recurso_tag_value    = "true"
+
+  depends_on = [module.iam_policy_role]
 }
