@@ -2,14 +2,15 @@ module "instancias" {
   #source = "git@github.com:Victor-Borges-Silva/Modulo-instancias.git?ref=v1.0.4"
   source = "../Modulo-instancias/"
 
-  numero_de_ec2  = 1
-  tipo_instancia = "t3.micro"
+  numero_de_ec2  = var.numero_de_ec2
+  tipo_instancia = var.tipo_instancia
 
+  for_each = { for atributo in var.tags : atributo.Name => atributo }
   tags = {
-    Name        = "Projeto_Final"
-    Terraform   = "Sim"
-    Environment = "Dev"
-    Backup      = "true"
+    Name        = each.value.Name
+    Terraform   = each.value.Terraform
+    Environment = each.value.Environment
+    Backup      = each.value.Backup
   }
 }
 
@@ -17,7 +18,7 @@ module "instancias" {
 module "iam_policy_role" {
   #source = "git@github.com:Victor-Borges-Silva/Modulo-iam.git?ref=v1.0.5"
   source = "../Modulo-iam/"
-  #  for_each = { for atributo in var.modulo_iam_policy_role : null => atributo }
+  #  for_each = { for atributo in var.modulo_iam_policy_role : atributo.policy_name => atributo }
   #
   #  #Criação da politica para EC2
   #  policy_name        = each.value.policy_name
@@ -44,11 +45,15 @@ module "iam_policy_role" {
   description_role_backup = var.description_role_backup
 }
 
+locals {
+  instance_id = tolist(module.instancias.instance_id)
+}
+
 module "lambda_inicia" {
   #source = "git@github.com:Victor-Borges-Silva/Modulo-lambda-inicia.git?ref=v1.0.5"
   source                   = "../Modulo-lambda-inicia/"
   nome_funcao_inicia       = "IniciaEC2"
-  instancia_id             = module.instancias.instance_id
+  instancia_id             = local.instance_id
   role                     = module.iam_policy_role.iam_role_arn_ec2
   tamanho_memoria          = 128
   timeout                  = 3
@@ -62,7 +67,7 @@ module "lambda_desliga" {
   #source = "git@github.com:Victor-Borges-Silva/Modulo-lambda-desliga.git?ref=v1.0.4"
   source                   = "../Modulo-lambda-desliga/"
   nome_funcao_desliga      = "DesligaEC2"
-  instancia_id             = module.instancias.instance_id
+  instancia_id             = local.instance_id
   role                     = module.iam_policy_role.iam_role_arn_ec2
   tamanho_memoria          = 128
   timeout                  = 3

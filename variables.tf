@@ -1,10 +1,39 @@
+#================================================================================
+# module instancias
+#================================================================================
+variable "numero_de_ec2" {
+  type        = number
+  description = "Quantidade de instancias EC2 a ser provisionada"
+}
+
+variable "tipo_instancia" {
+  type        = string
+  description = "Tipo de instancia EC2 a ser provisionada"
+}
+
+variable "tags" {
+  type = set(object({
+    Name        = string
+    Terraform   = string
+    Environment = string
+    Backup      = string
+  }))
+
+  description = "Etiqueta para as instancias EC2"
+}
+
+
+#================================================================================
+# module iam_policy_role
+#================================================================================
+
 #variable "modulo_iam_policy_role" {
 #  description = "Lista da variaveis que serão usadas no modulo iam_policy_role"
 #  type = set(object({
-#    policy_name             = string
-#    policy_description      = string
+#    policy_name        = string
+#    policy_description = string
 #    role_name               = string
-#    role_description        = string
+#    role_description = string
 #    nome_role_backup        = string
 #    description_role_backup = string
 #  }))
