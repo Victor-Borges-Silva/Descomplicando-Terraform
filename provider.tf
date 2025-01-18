@@ -1,9 +1,11 @@
 terraform {
   #  backend "s3" {
-  #    bucket         = "descomplicando-terraform-turma-2024" #nome do bucket
-  #    key            = "aula_backend"
-  #    region         = "us-east-1"
+  #    bucket = "descomplicando-terraform-turma-2024-vborges" #nome do bucket
+  #    key    = "projeto_final"
+  #    region = "us-west-1"
   #  }
+  backend "local" {
+  }
 
   required_providers {
     aws = {
